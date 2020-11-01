@@ -1,40 +1,9 @@
-import React, { useState } from 'react';
-import AudioAnalyser from './components/AudioAnalyser';
+import React from 'react';
+import routes from './pages';
+import { AppContextProvider } from './contexts';
 
 const App = () => {
-  const [audio, setAudio] = useState();
-
-  const getMicrophone = async () => {
-    const audioMedia = await navigator.mediaDevices.getUserMedia({
-      audio: true,
-      video: false,
-    });
-    setAudio(audioMedia);
-  };
-
-  const stopMicrophone = () => {
-    audio.getTracks().forEach((track) => track.stop());
-    setAudio(null);
-  };
-
-  const toggleMicrophone = () => {
-    if (audio) {
-      stopMicrophone();
-    } else {
-      getMicrophone();
-    }
-  };
-
-  return (
-    <div className="App">
-      <div className="controls">
-        <button onClick={toggleMicrophone} type="button">
-          {audio ? 'Stop microphone' : 'Get microphone input'}
-        </button>
-      </div>
-      <AudioAnalyser audio={audio} />
-    </div>
-  );
+  return <AppContextProvider>{routes}</AppContextProvider>;
 };
 
 export default App;

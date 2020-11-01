@@ -5,8 +5,7 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  display: grid;
-  background: #333e5a;
+  background-color: #282c34;
 }
 
 code {
@@ -14,39 +13,5 @@ code {
     monospace;
 }
 
-/* body {
-  margin: 0;
-  padding: 0;
-  font-family: Helvetica, Arial, sans-serif;
-} */
-
-a {
-  color: #fff;
-}
-
-header {
-  background: #f0293e;
-  color: #fff;
-  text-align: center;
-}
-
-main {
-  min-height: 80vh;
-  background: #fff;
-}
-main .controls {
-  text-align: center;
-  padding: 0.5em 0;
-  background: #333e5a;
-  color: #fff;
-}
-main canvas {
-  padding: 20px;
-  margin: 0 auto;
-  display: block;
-}
-footer {
-  background: #333e5a;
-  color: #fff;
-  text-align: center;
-}
+@import 'App.styles.scss';
+@import './components/Toolbar/Toolbar.styles.scss';

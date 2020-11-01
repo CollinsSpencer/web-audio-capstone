@@ -2,33 +2,32 @@ import React, { useCallback, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 
 const FrequencyVisualiser = ({ getFrequencyData }) => {
-  const canvasRef = useRef(null);
+  const canvasRef = useRef();
   const requestRef = useRef();
 
   const draw = (audioData) => {
     const canvas = canvasRef.current;
+    canvas.width = document.body.clientWidth;
     const { height, width } = canvas;
     const context = canvas.getContext('2d');
+    context.clearRect(0, 0, canvas.width, canvas.height);
     let x = 0;
-    const sliceWidth = (width * 1.0) / audioData.length;
+    const barWidth = width / audioData.length;
 
-    context.lineWidth = 2;
-    context.strokeStyle = '#000000';
-    context.clearRect(0, 0, width, height);
-
-    context.beginPath();
-    context.moveTo(0, height / 2);
-    audioData.forEach((item) => {
-      const y = (item / 255.0) * height;
-      context.lineTo(x, y);
-      x += sliceWidth;
+    audioData.forEach((uint8Value) => {
+      const barHeight = uint8Value;
+      const r = uint8Value;
+      const g = (255 - uint8Value) / 2;
+      const b = (255 - uint8Value) / 4;
+      context.fillStyle = `rgb(${r},${g},${b})`;
+      context.fillRect(x, (height - barHeight) / 2, barWidth, barHeight);
+      x += barWidth;
     });
-    context.lineTo(x, height / 2);
-    context.stroke();
   };
 
   const animate = useCallback(() => {
-    getFrequencyData(draw);
+    const audioData = getFrequencyData();
+    draw(audioData);
     requestRef.current = requestAnimationFrame(animate);
   }, [getFrequencyData]);
 
@@ -37,7 +36,7 @@ const FrequencyVisualiser = ({ getFrequencyData }) => {
     return () => cancelAnimationFrame(requestRef.current);
   }, [animate]);
 
-  return <canvas width="600" height="300" ref={canvasRef} />;
+  return <canvas width="600" height="256" ref={canvasRef} />;
 };
 
 FrequencyVisualiser.propTypes = {

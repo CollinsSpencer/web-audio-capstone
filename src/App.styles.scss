@@ -1,0 +1,26 @@
+.App {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+a {
+  color: #fff;
+}
+
+header {
+  background: #4ca5cd;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+main {
+  flex: 1 0 auto;
+}
+
+footer {
+  flex-shrink: 0;
+  background: #736d67;
+  color: #fff;
+}

@@ -1,54 +1,50 @@
-import React, { useEffect, useRef } from 'react';
-import PropTypes from 'prop-types';
+import React from 'react';
+import { useAppAudioContext } from '../contexts';
 import WaveformVisualiser from './WaveformVisualiser';
 import FrequencyVisualiser from './FrequencyVisualiser';
 
-const AudioAnalyser = ({ audio }) => {
-  const analyser = useRef();
+const AudioAnalyser = () => {
+  const { audioAnalyser, startAnalysing, stopAnalysing } = useAppAudioContext();
 
-  const getTimeDomainData = (styleAdjuster) => {
-    const bufferLength = analyser.current.frequencyBinCount;
-    const dataArray = new Uint8Array(bufferLength);
-    analyser.current.getByteTimeDomainData(dataArray);
-    styleAdjuster(dataArray);
-  };
-  const getFrequencyData = (styleAdjuster) => {
-    const bufferLength = analyser.current.frequencyBinCount;
-    const dataArray = new Uint8Array(bufferLength);
-    analyser.current.getByteFrequencyData(dataArray);
-    styleAdjuster(dataArray);
+  const toggleMicrophone = () => {
+    if (audioAnalyser) {
+      stopAnalysing();
+    } else {
+      startAnalysing();
+    }
   };
 
-  useEffect(() => {
-    if (!audio) return () => {};
-    const audioContext = new (window.AudioContext ||
-      window.webkitAudioContext)();
-    const source = audioContext.createMediaStreamSource(audio);
-    analyser.current = audioContext.createAnalyser();
-    source.connect(audioContext.destination);
-    source.connect(analyser.current);
+  const getTimeDomainData = () => {
+    if (!audioAnalyser) return [];
+    const bufferLength = audioAnalyser.frequencyBinCount;
+    const dataArray = new Uint8Array(bufferLength);
+    audioAnalyser.getByteTimeDomainData(dataArray);
+    return dataArray;
+  };
+  const getFrequencyData = () => {
+    if (!audioAnalyser) return [];
+    const bufferLength = audioAnalyser.frequencyBinCount;
+    const dataArray = new Uint8Array(bufferLength);
+    audioAnalyser.getByteFrequencyData(dataArray);
+    return dataArray;
+  };
 
-    return () => {
-      analyser.current.disconnect();
-      source.disconnect();
-    };
-  }, [audio]);
-
-  return audio ? (
+  return (
     <>
-      <WaveformVisualiser getTimeDomainData={getTimeDomainData} />
-      <FrequencyVisualiser getFrequencyData={getFrequencyData} />
-    </>
-  ) : (
-    <>Record</>
-  );
-};
+      <div className="record">
+        <button onClick={toggleMicrophone} type="button">
+          {audioAnalyser ? 'Stop microphone' : 'Get microphone input'}
+        </button>
+      </div>
 
-AudioAnalyser.defaultProps = {
-  audio: null,
-};
-AudioAnalyser.propTypes = {
-  audio: PropTypes.instanceOf(MediaStream),
+      {audioAnalyser && (
+        <>
+          <WaveformVisualiser getTimeDomainData={getTimeDomainData} />
+          <FrequencyVisualiser getFrequencyData={getFrequencyData} />
+        </>
+      )}
+    </>
+  );
 };
 
 export default AudioAnalyser;
