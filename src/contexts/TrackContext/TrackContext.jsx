@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useMemo, useReducer } from 'react';
 import PropTypes from 'prop-types';
 import { actions, initialState, reducer } from './reducer';
+import { useAppAudioContext } from '../AppAudioContext';
 
 const defaultContext = {
   tracks: [],
@@ -8,18 +9,22 @@ const defaultContext = {
 };
 const TrackContext = createContext(defaultContext);
 
-const getContextValues = (state, dispatch) => ({
-  tracks: state.tracks,
-  addTrack: (track) => dispatch(actions.addTrack(track)),
-});
-
 export const useTrackContext = () => useContext(TrackContext);
 export const TrackContextProvider = ({ children }) => {
+  const { addAudioSource } = useAppAudioContext();
   const [state, dispatch] = useReducer(reducer, initialState);
-  const contextValue = useMemo(() => getContextValues(state, dispatch), [
-    state,
-    dispatch,
-  ]);
+
+  const contextValue = useMemo(
+    () => ({
+      tracks: state.tracks,
+      addTrack: async (track) => {
+        console.log(track);
+        addAudioSource(track.audioBuffer);
+        dispatch(actions.addTrack(track));
+      },
+    }),
+    [state, dispatch, addAudioSource],
+  );
 
   return (
     <TrackContext.Provider value={contextValue}>

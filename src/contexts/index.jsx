@@ -2,17 +2,14 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { BrowserRouter as Router } from 'react-router-dom';
 
-import { AppAudioContextProvider } from './AppAudioContext';
+import { AppAudioContextProvider } from './AppAudioContext/AppAudioContext';
 import { ToastContextProvider } from './ToastContext';
-import { TrackContextProvider } from './TrackContext';
 
 const AppContextProvider = ({ children }) => {
   return (
     <Router>
       <ToastContextProvider>
-        <TrackContextProvider>
-          <AppAudioContextProvider>{children}</AppAudioContextProvider>
-        </TrackContextProvider>
+        <AppAudioContextProvider>{children}</AppAudioContextProvider>
       </ToastContextProvider>
     </Router>
   );
@@ -26,5 +23,4 @@ AppContextProvider.propTypes = {
 };
 
 export { AppContextProvider };
-export * from './AppAudioContext';
-export * from './TrackContext';
+export * from './AppAudioContext/AppAudioContext';

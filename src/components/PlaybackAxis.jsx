@@ -1,5 +1,5 @@
 /* eslint-disable no-nested-ternary */
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { axisBottom } from 'd3-axis';
 import { timeSecond, timeMinute, timeHour } from 'd3-time';
@@ -32,25 +32,47 @@ const PlaybackAxis = ({ timeScale, width }) => {
     color: 'white',
   };
 
-  const drawAxis = () => {
-    const xAxis = axisBottom(timeScale)
-      .tickFormat(multiFormat)
-      .tickSize('100')
-      .tickPadding('0');
-    const xAxisRef = (axis) => {
-      if (axis) {
-        xAxis(select(axis).attr('font-size', '1em'));
-        selectAll('text')
-          .attr('y', '0')
-          .attr('x', '3')
-          .attr('dy', '1em')
-          .style('text-anchor', 'start');
-      }
-    };
-    return <g ref={xAxisRef} textAnchor="start" />;
-  };
+  const xAxisRef = useRef();
 
-  return <svg style={styles}>{drawAxis()}</svg>;
+  const xAxis = axisBottom(timeScale)
+    .tickFormat(multiFormat)
+    .tickSize('100')
+    .tickPadding('0');
+
+  useEffect(() => {
+    if (xAxisRef.current) {
+      xAxis(select(xAxisRef.current).attr('font-size', '1em'));
+      selectAll('text')
+        .attr('y', '0')
+        .attr('x', '3')
+        .attr('dy', '1em')
+        .style('text-anchor', 'start');
+    }
+  });
+
+  // const drawAxis = () => {
+  //   const xAxis = axisBottom(timeScale)
+  //     .tickFormat(multiFormat)
+  //     .tickSize('100')
+  //     .tickPadding('0');
+  //   const xAxisRef = (axis) => {
+  //     if (axis) {
+  //       xAxis(select(axis).attr('font-size', '1em'));
+  //       selectAll('text')
+  //         .attr('y', '0')
+  //         .attr('x', '3')
+  //         .attr('dy', '1em')
+  //         .style('text-anchor', 'start');
+  //     }
+  //   };
+  //   return <g ref={xAxisRef} textAnchor="start" />;
+  // };
+
+  return (
+    <svg style={styles}>
+      <g ref={xAxisRef} textAnchor="start" />
+    </svg>
+  );
 };
 
 PlaybackAxis.propTypes = {

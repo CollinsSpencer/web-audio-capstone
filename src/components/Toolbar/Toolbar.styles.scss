@@ -1,12 +1,17 @@
 .toolbar {
   background: #736d67;
   padding: 1.5em 0;
-}
 
-.toolbar button {
-  background: #f2cc59;
-  border: none;
-  border-radius: 4px;
-  padding: 1em;
-  text-transform: capitalize;
+  button {
+    background: #f2cc59;
+    border: none;
+    border-radius: 4px;
+    padding: 1em;
+    text-transform: capitalize;
+    margin-right: 16px;
+
+    &:last-child {
+      margin-right: 0;
+    }
+  }
 }

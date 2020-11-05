@@ -1,10 +1,16 @@
-import React, { useEffect, useRef } from 'react';
-import { useAppAudioContext, useTrackContext } from '../contexts';
+import React, { useCallback, useEffect, useRef } from 'react';
+import { useAppAudioContext } from '../contexts';
 
 const AudioRecorder = () => {
-  const { tracks, addTrack } = useTrackContext();
   const audioData = useRef([]);
-  const { audioRecorder, startRecording, stopRecording } = useAppAudioContext();
+  const {
+    audioRecorder,
+    getAudioContext,
+    startRecording,
+    stopRecording,
+    tracks,
+    addTrack,
+  } = useAppAudioContext();
 
   const handleRecord = async () => {
     if (audioRecorder) {
@@ -14,28 +20,53 @@ const AudioRecorder = () => {
     }
   };
 
+  const convertBlobToAudioBuffer = useCallback(
+    async (blob) => {
+      const audioContext = getAudioContext();
+      const fileReader = new FileReader();
+
+      return new Promise((resolve) => {
+        fileReader.onloadend = () => {
+          const arrayBuffer = fileReader.result;
+
+          audioContext.decodeAudioData(arrayBuffer, (audioBuffer) => {
+            resolve(audioBuffer);
+          });
+        };
+
+        // Load blob
+        fileReader.readAsArrayBuffer(blob);
+      });
+    },
+    [getAudioContext],
+  );
+
   useEffect(() => {
     if (audioRecorder) {
       audioRecorder.ondataavailable = (e) => {
         audioData.current.push(e.data);
       };
 
-      audioRecorder.onstop = () => {
+      audioRecorder.onstop = async () => {
         const blob = new Blob(audioData.current, {
           type: 'audio/ogg; codecs=opus',
         });
-        const audioURL = window.URL.createObjectURL(blob);
+        // const audioURL = window.URL.createObjectURL(blob);
+        const audioBuffer = await convertBlobToAudioBuffer(blob);
+
         const track = {
-          audioURL,
-          audioBlob: blob,
-          audio: new Audio(audioURL),
+          // audioURL,
+          // audioBlob: blob,
+          audioBuffer,
+          // audio: new Audio(audioURL),
+          offset: 0,
           name: `Take #${tracks.length + 1}`,
         };
         addTrack(track);
         audioData.current = [];
       };
     }
-  }, [addTrack, audioData, audioRecorder, tracks]);
+  }, [addTrack, audioData, audioRecorder, tracks, convertBlobToAudioBuffer]);
 
   return (
     <>

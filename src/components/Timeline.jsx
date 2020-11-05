@@ -1,38 +1,59 @@
-import { scaleTime } from 'd3-scale';
 import React, { useRef, useState, useEffect } from 'react';
+import { scaleTime } from 'd3-scale';
 // import PropTypes from 'prop-types';
-import { useTrackContext } from '../contexts';
+import { useAppAudioContext } from '../contexts';
+import { dateFromSeconds } from '../utils';
 import AudioTrack from './AudioTrack';
 import PlaybackAxis from './PlaybackAxis';
 import PlaybackHead from './PlaybackHead';
 
 const Timeline = () => {
-  const { tracks } = useTrackContext();
+  const { tracks } = useAppAudioContext();
   const timelineRef = useRef();
-  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+  const [dimensions, setDimensions] = useState(
+    timelineRef.current
+      ? timelineRef.current.getBoundingClientRect()
+      : { width: 0, height: 0 },
+  );
 
-  const currentPlaybackTime = 0;
   const timelineStartTime = 0;
-  const timelineEndTime = 6;
+  const timelineEndTime = 12;
 
   const timeScale = scaleTime()
     .domain([
-      new Date(0, 0, 0, 1, 0, timelineStartTime),
-      new Date(0, 0, 0, 1, 0, timelineEndTime),
+      dateFromSeconds(timelineStartTime),
+      dateFromSeconds(timelineEndTime),
     ])
     .range([0, dimensions.width]);
 
+  // if (timelineRef.current) {
+  //   const currentDimensions = timelineRef.current.getBoundingClientRect();
+  //   if (
+  //     dimensions.width !== currentDimensions.width &&
+  //     dimensions.height !== currentDimensions.height
+  //   ) {
+  //     setDimensions(currentDimensions);
+  //   }
+  // }
+
   useEffect(() => {
-    if (timelineRef) setDimensions(timelineRef.current.getBoundingClientRect());
+    const handleResize = () => {
+      if (timelineRef.current)
+        setDimensions(timelineRef.current.getBoundingClientRect());
+      else
+        setDimensions({
+          height: window.innerHeight,
+          width: window.innerWidth,
+        });
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, [timelineRef]);
 
   return (
     <div ref={timelineRef}>
-      <PlaybackHead
-        timeScale={timeScale}
-        currentPlaybackTime={new Date(0, 0, 0, 1, 0, currentPlaybackTime)}
-        height={dimensions.height}
-      />
+      <PlaybackHead timeScale={timeScale} />
       <PlaybackAxis
         timeScale={timeScale}
         timelineStartTime={timelineStartTime}
@@ -42,12 +63,16 @@ const Timeline = () => {
       {tracks
         ? tracks.map((t) => (
             <AudioTrack
-              audio={t.audio}
+              timeScale={timeScale}
+              // audio={t.audio}
+              // audioBuffer={t.audioBuffer}
+              audioDuration={t.audioBuffer.duration}
               name={t.name}
+              trackId={t.trackId}
               key={t.name}
-              currentPlaybackTime={currentPlaybackTime}
-              timelineStartTime={timelineStartTime}
-              timelineEndTime={timelineEndTime}
+              // currentPlaybackTime={currentPlaybackTime}
+              // timelineStartTime={timelineStartTime}
+              // timelineEndTime={timelineEndTime}
             />
           ))
         : 'record to make your first track'}
