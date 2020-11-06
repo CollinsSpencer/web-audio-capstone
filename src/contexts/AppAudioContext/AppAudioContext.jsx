@@ -113,7 +113,7 @@ export const AppAudioContextProvider = ({ children }) => {
     setAudioElement(audio);
     const audioSource = audioContext.createMediaElementSource(audio);
     audioSource.connect(audioContext.destination);
-  }, [state.tracks, getAudioContext]);
+  }, [state.tracks, getAudioContext, mixDown]);
 
   const context = useMemo(
     () => ({
@@ -187,7 +187,6 @@ export const AppAudioContextProvider = ({ children }) => {
       audioRecorder,
       audioStreamSourceNode,
       getAudioContext,
-      // mixDown,
       state.tracks,
     ],
   );

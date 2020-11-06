@@ -116,7 +116,7 @@ const AudioTrack = ({ trackId, audio, name, timeScale, audioDuration }) => {
           }),
       );
     }
-  }, [trackRef.current]);
+  }, [setTrackOffset, timeScale, trackId]);
 
   // const drawTrack = () => {
   // const xAxis = axisBottom(timeScale)
