@@ -9,10 +9,10 @@ import React, {
   useState,
 } from 'react';
 import PropTypes from 'prop-types';
-import Crunker from 'crunker';
 import { v4 as uuidv4 } from 'uuid';
 import { useToastContext } from '../ToastContext';
 import { actions, initialState, reducer } from './reducer';
+import { bufferToWave } from '../../utils/audio';
 
 const defaultContext = {
   open: () => null,
@@ -106,8 +106,11 @@ export const AppAudioContextProvider = ({ children }) => {
     if (!tracks || tracks.length === 0) return;
     const audioContext = getAudioContext();
     const merged = mixDown(tracks);
-    const crunker = new Crunker(tracks[0].audioBuffer.sampleRate);
-    const { blob } = crunker.export(merged, 'audio/wav');
+    const { blob } = bufferToWave(
+      merged,
+      'audio/wav; codecs=0',
+      tracks[0].audioBuffer.sampleRate,
+    );
     const audioURL = (window.URL || window.webkitURL).createObjectURL(blob);
     const audio = new Audio(audioURL);
     setAudioElement(audio);
