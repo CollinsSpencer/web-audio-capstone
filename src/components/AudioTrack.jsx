@@ -2,26 +2,35 @@ import React, { useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { drag } from 'd3-drag';
 import { select } from 'd3-selection';
+import { scaleBand, scaleLinear } from 'd3-scale';
+import { max, range } from 'd3-array';
 import { dateFromSeconds, secondsFromDate } from '../utils';
 import { useAppAudioContext } from '../contexts';
 
-const AudioTrack = ({ trackId, audio, name, timeScale, audioDuration }) => {
+const AudioTrack = ({
+  trackId,
+  filteredData,
+  name,
+  timeScale,
+  audioDuration,
+}) => {
   const { setTrackOffset } = useAppAudioContext();
   // const requestRef = useRef();
   const trackRef = useRef();
   // const [audioDuration, setAudioDuration] = useState(0);
   const trackWidth = timeScale(dateFromSeconds(audioDuration));
+  const height = 50;
 
   const styles = {
     root: {
       width: '100%',
-      height: '50px',
+      height: `${height}px`,
       textAlign: 'left',
       borderBottom: '1px solid grey',
     },
     svg: {
       width: '100%',
-      height: '50px',
+      height: `${height}px`,
     },
     rect: {
       fill: '#3579A9',
@@ -112,7 +121,7 @@ const AudioTrack = ({ trackId, audio, name, timeScale, audioDuration }) => {
             const x = select(trackRef.current).attr('x');
             const offset = secondsFromDate(timeScale.invert(x));
             setTrackOffset(trackId, offset);
-            console.log(x, offset);
+            console.log({ x, offset });
           }),
       );
     }
@@ -163,6 +172,31 @@ const AudioTrack = ({ trackId, audio, name, timeScale, audioDuration }) => {
   //   }
   // });
 
+  useEffect(() => {
+    const x = scaleBand()
+      .domain(range(filteredData.length))
+      .range([0, trackWidth]);
+
+    const y = scaleLinear()
+      .domain([0, max(filteredData)])
+      .range([1, height]);
+
+    const bar = select(trackRef.current)
+      .selectAll('g')
+      .data(filteredData)
+      .join('g')
+      .attr(
+        'transform',
+        (d, i) => `translate(${x(i)}, ${height / 2 - y(d) / 2})`,
+      );
+
+    bar
+      .append('rect')
+      .attr('fill', '#12345678')
+      .attr('width', x.bandwidth())
+      .attr('height', y);
+  }, [filteredData, trackWidth]);
+
   return (
     <div style={styles.root}>
       {/* <p>{name}</p>
@@ -178,7 +212,7 @@ const AudioTrack = ({ trackId, audio, name, timeScale, audioDuration }) => {
             style={styles.rect}
             textAnchor="start"
             width={trackWidth}
-            height="50"
+            height={height}
             rx="5"
             ry="5"
           />
@@ -195,6 +229,7 @@ const AudioTrack = ({ trackId, audio, name, timeScale, audioDuration }) => {
 AudioTrack.propTypes = {
   // audio: PropTypes.instanceOf(HTMLAudioElement).isRequired,
   audioDuration: PropTypes.number.isRequired,
+  filteredData: PropTypes.arrayOf(PropTypes.number).isRequired,
   name: PropTypes.string.isRequired,
   timeScale: PropTypes.func.isRequired,
   trackId: PropTypes.string.isRequired,

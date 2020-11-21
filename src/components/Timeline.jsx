@@ -67,6 +67,7 @@ const Timeline = () => {
               // audio={t.audio}
               // audioBuffer={t.audioBuffer}
               audioDuration={t.audioBuffer.duration}
+              filteredData={t.filteredData}
               name={t.name}
               trackId={t.trackId}
               key={t.name}

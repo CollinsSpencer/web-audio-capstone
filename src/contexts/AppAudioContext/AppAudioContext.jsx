@@ -107,13 +107,28 @@ export const AppAudioContextProvider = ({ children }) => {
     const audioContext = getAudioContext();
     const merged = mixDown(tracks);
     const crunker = new Crunker(tracks[0].audioBuffer.sampleRate);
-    const { blob } = crunker.export(merged, 'audio/mp3');
+    const { blob } = crunker.export(merged, 'audio/wav');
     const audioURL = (window.URL || window.webkitURL).createObjectURL(blob);
     const audio = new Audio(audioURL);
     setAudioElement(audio);
     const audioSource = audioContext.createMediaElementSource(audio);
     audioSource.connect(audioContext.destination);
   }, [state.tracks, getAudioContext, mixDown]);
+
+  const downloadFile = useCallback(
+    (fileName) => {
+      const { currentSrc: url } = audioElement;
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => {
+        document.body.removeChild(a);
+      }, 0);
+    },
+    [audioElement],
+  );
 
   const context = useMemo(
     () => ({
@@ -157,6 +172,11 @@ export const AppAudioContextProvider = ({ children }) => {
       startPlaying: () => {
         audioElement.play();
       },
+      downloadAudio: (fileName) => {
+        const extension = '.wav';
+        const name = !fileName || fileName.length === 0 ? 'audio' : fileName;
+        downloadFile(`${name}${extension}`);
+      },
       getCurrentPlaybackTime: () => {
         // if (audioElement) console.log(audioElement.currentTime);
         return audioElement ? audioElement.currentTime : 0;
@@ -180,12 +200,14 @@ export const AppAudioContextProvider = ({ children }) => {
       setTrackOffset: (trackId, offset) => {
         dispatch(actions.updateTrackOffset(trackId, offset));
       },
+      hasAudio: !!audioElement,
     }),
     [
       audioAnalyser,
       audioElement,
       audioRecorder,
       audioStreamSourceNode,
+      downloadFile,
       getAudioContext,
       state.tracks,
     ],

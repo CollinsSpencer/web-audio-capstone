@@ -15,7 +15,7 @@ const createRoute = ({
 
 const routes = [
   <Route exact path="/" key="home">
-    <Redirect to="/analysis" />
+    <Redirect to="/record" />
   </Route>,
   createRoute({
     path: '/record',

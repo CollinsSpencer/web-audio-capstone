@@ -24,3 +24,152 @@ footer {
   background: #736d67;
   color: #fff;
 }
+
+button {
+  align-items: center;
+  background-color: #cccccc;
+  border-radius: 4px;
+  border: none;
+  color: #555555;
+  cursor: pointer;
+  display: inline-flex;
+  font-weight: 500;
+  line-height: 1rem;
+  padding: 0.5rem 1rem;
+  text-align: left;
+
+  &.primary {
+    background-color: #4ca5cd;
+    color: #ffffff;
+    &:hover {
+      background-color: #4ca5cdcc;
+    }
+  }
+
+  &.secondary {
+    background-color: #f2cc59;
+    color: #333333;
+    &:hover {
+      background-color: #f2cc59cc;
+    }
+  }
+
+  &.outline {
+    background-color: #cccccc;
+    border-width: 2px;
+    border-style: solid;
+    color: #000000;
+
+    &:hover {
+      background-color: #cccccccc;
+    }
+
+    &.primary {
+      border-color: #4ca5cd;
+    }
+
+    &.secondary {
+      border-color: #f2cc59;
+    }
+  }
+
+  &:disabled,
+  &.disabled,
+  &[disabled] {
+    background-color: #cccccc;
+    color: #999999;
+
+    &.outline {
+      border-color: transparent;
+    }
+
+    &:hover,
+    &.primary:hover,
+    &.secondary:hover {
+      background-color: #cccccc;
+      color: #999999;
+      cursor: default;
+    }
+  }
+}
+
+.input-area {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+
+  label {
+    position: absolute;
+    top: 0;
+    left: 0;
+    transition: color 200ms cubic-bezier(0, 0, 0.2, 1) 0ms,
+      transform 200ms cubic-bezier(0, 0, 0.2, 1) 0ms;
+    z-index: 1;
+    transform: translate(calc(0.5rem - 3.5px), -0.5rem) scale(0.7);
+    transform-origin: top left;
+    pointer-events: none;
+    line-height: 1rem;
+    background-color: #ffffff;
+    padding: 0 5px;
+  }
+
+  input,
+  textarea {
+    border: 1px solid #cccccc;
+    border-bottom-color: #555555;
+    border-radius: 4px 4px 0 0;
+    color: #333333;
+    padding: 1rem 0.5rem;
+
+    &:focus {
+      border-bottom-color: #4ca5cd;
+      border-bottom-width: 2px;
+      outline: none;
+    }
+  }
+}
+
+.modal {
+  border: 1px solid #cccccc;
+  background: #ffffff;
+  overflow: auto;
+  border-radius: 6px;
+  outline: none;
+  padding: 0;
+  width: clamp(200px, 50vw, 700px);
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 50px;
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  p {
+    margin: 0;
+  }
+
+  .modal-header {
+    border-bottom: 1px solid #cccccc;
+    padding: 24px;
+  }
+
+  .modal-content {
+    max-height: calc(100vh - 280px);
+    overflow: auto;
+    padding: 24px 24px 0px;
+
+    > * + * {
+      margin-top: 24px;
+    }
+  }
+
+  .modal-footer {
+    padding: 24px;
+    display: flex;
+    flex-flow: row;
+    justify-content: flex-end;
+  }
+}

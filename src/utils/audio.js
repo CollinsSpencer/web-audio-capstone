@@ -71,7 +71,7 @@ const renderAudioElement = (blob, type) => {
 
 // eslint-disable-next-line import/prefer-default-export
 export const bufferToWave = (buffer, audioType) => {
-  const type = audioType || 'audio/mp3';
+  const type = audioType || 'audio/wav';
   const recorded = interleave(buffer);
   const dataview = writeHeaders(recorded);
   const audioBlob = new Blob([dataview], { type });

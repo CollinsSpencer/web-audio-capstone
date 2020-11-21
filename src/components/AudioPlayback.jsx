@@ -2,7 +2,7 @@ import React from 'react';
 import { useAppAudioContext } from '../contexts';
 
 const AudioPlayback = () => {
-  const { startPlaying } = useAppAudioContext();
+  const { hasAudio, startPlaying } = useAppAudioContext();
   // const audioData = useRef([]);
   // const { audioContext } = useAppAudioContext();
 
@@ -17,7 +17,12 @@ const AudioPlayback = () => {
 
   return (
     <>
-      <button onClick={handlePlay} type="button">
+      <button
+        onClick={handlePlay}
+        type="button"
+        className="secondary"
+        disabled={!hasAudio}
+      >
         Play
       </button>
       {/* {tracks && <hr />}
