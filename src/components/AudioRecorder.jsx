@@ -64,24 +64,16 @@ const AudioRecorder = () => {
   useEffect(() => {
     if (audioRecorder) {
       audioRecorder.ondataavailable = (e) => {
-        console.log(e);
         audioData.current.push(e.data);
-        if (audioData.current.length % 10 === 0) {
-          console.log(audioData.current[audioData.current.length - 1]);
-        }
       };
 
       audioRecorder.onstop = async () => {
-        console.log(audioData.current[0], audioData.current[1]);
         const blob = new Blob(audioData.current, {
           type: 'audio/wav; codecs=0',
         });
         // const audioURL = window.URL.createObjectURL(blob);
         const audioBuffer = await convertBlobToAudioBuffer(blob);
         const filteredData = filterData(audioBuffer);
-
-        console.log({ audioBuffer }, audioBuffer.length);
-        console.log({ filteredData }, filteredData.length);
 
         const track = {
           // audioURL,

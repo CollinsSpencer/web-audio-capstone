@@ -39,27 +39,23 @@ const ActiveRecordingTrack = ({ timeScale }) => {
   useEffect(() => {
     const y = scalePow().exponent(3).domain([0, 255]).range([1, height]);
 
-    const bar = select(trackRef.current)
+    const lastElement = filteredData[filteredData.length - 1];
+    const barWidth = lastElement
+      ? timeScale(dateFromSeconds(lastElement.timeOffset)) / filteredData.length
+      : trackWidth / filteredData.length;
+
+    select(trackRef.current)
       .select('g')
-      .selectAll('g')
+      .selectAll('rect')
       .data(filteredData)
-      .enter()
-      .append('g')
+      .join('rect')
       .attr(
         'transform',
         ({ timeOffset, value }) =>
           `translate(${timeScale(dateFromSeconds(timeOffset))}, ${
             height / 2 - y(value) / 2
           })`,
-      );
-
-    const lastElement = filteredData[filteredData.length - 1];
-    const barWidth = lastElement
-      ? timeScale(dateFromSeconds(lastElement.timeOffset)) / filteredData.length
-      : trackWidth / filteredData.length;
-
-    bar
-      .append('rect')
+      )
       .attr('class', 'track-audio')
       .attr('width', barWidth)
       .attr('height', ({ value }) => y(value));
@@ -76,13 +72,12 @@ const ActiveRecordingTrack = ({ timeScale }) => {
           ...filteredData,
           { timeOffset, value: Math.max(...audioData) },
         ]);
+        requestRef.current = requestAnimationFrame(animate);
       } else {
         setFilteredData([]);
         setTrackWidth(0);
+        cancelAnimationFrame(requestRef.current);
       }
-
-      if (isRecording) requestRef.current = requestAnimationFrame(animate);
-      else cancelAnimationFrame(requestRef.current);
     },
     [
       getFrequencyData,

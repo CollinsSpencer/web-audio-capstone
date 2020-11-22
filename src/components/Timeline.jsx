@@ -7,18 +7,23 @@ import AudioTrack from './AudioTrack';
 import PlaybackAxis from './PlaybackAxis';
 import PlaybackHead from './PlaybackHead';
 import ActiveRecordingTrack from './ActiveRecordingTrack';
+import useKeyboardShortcut from '../hooks/useKeyboardShortcut';
 
 const Timeline = () => {
-  const { tracks, isRecording } = useAppAudioContext();
+  const { audioElement, tracks, isRecording } = useAppAudioContext();
   const timelineRef = useRef();
+  const [audioDuration, setAudioDuration] = useState(0);
+  const minTime = 0;
+  const maxTime = Math.max(audioDuration * 1.1, 2);
+  const shortestTime = 0.5;
+  const [timelineStartTime, setTimelineStartTime] = useState(minTime);
+  const [timelineEndTime, setTimelineEndTime] = useState(maxTime);
   const [dimensions, setDimensions] = useState(
     timelineRef.current
       ? timelineRef.current.getBoundingClientRect()
       : { width: 0, height: 0 },
   );
-
-  const timelineStartTime = 0;
-  const timelineEndTime = 12;
+  const getKeys = useKeyboardShortcut(['Shift', 'Alt'], () => null);
 
   const timeScale = scaleTime()
     .domain([
@@ -27,15 +32,70 @@ const Timeline = () => {
     ])
     .range([0, dimensions.width]);
 
-  // if (timelineRef.current) {
-  //   const currentDimensions = timelineRef.current.getBoundingClientRect();
-  //   if (
-  //     dimensions.width !== currentDimensions.width &&
-  //     dimensions.height !== currentDimensions.height
-  //   ) {
-  //     setDimensions(currentDimensions);
-  //   }
-  // }
+  const handleWheel = (event) => {
+    const { deltaY } = event;
+    const { shift, alt } = getKeys();
+
+    if (shift && alt) {
+      // Zoom Horizontally
+      // Try just moving the end time
+      const newEndTime =
+        deltaY > 0
+          ? // Zoom out
+            timelineEndTime * 1.1
+          : // Zoom in
+            Math.max(timelineStartTime + shortestTime, timelineEndTime * 0.9);
+      if (newEndTime <= maxTime) {
+        setTimelineEndTime(newEndTime);
+      } else {
+        // Move the start time up if needed
+        const overshotTime = newEndTime - maxTime;
+        const newStartTime = timelineStartTime - overshotTime;
+        setTimelineEndTime(maxTime);
+        if (newStartTime >= minTime) {
+          setTimelineStartTime(newStartTime);
+        } else {
+          setTimelineStartTime(minTime);
+        }
+      }
+    } else if (shift) {
+      // Scroll Horizontally
+      const scrollAmount = (timelineEndTime - timelineStartTime) / 6;
+      if (deltaY > 0) {
+        // Scroll Right
+        const offset =
+          timelineEndTime + scrollAmount > maxTime
+            ? maxTime - timelineEndTime
+            : scrollAmount;
+        setTimelineStartTime(timelineStartTime + offset);
+        setTimelineEndTime(timelineEndTime + offset);
+      } else {
+        // Scroll Left
+        const offset =
+          timelineStartTime - scrollAmount < minTime
+            ? timelineStartTime - minTime
+            : scrollAmount;
+        setTimelineStartTime(timelineStartTime - offset);
+        setTimelineEndTime(timelineEndTime - offset);
+      }
+    }
+  };
+
+  useEffect(() => {
+    const handleDurationChange = () => {
+      if (audioElement.duration !== Infinity)
+        setAudioDuration(audioElement.duration);
+    };
+    if (audioElement)
+      audioElement.addEventListener('durationchange', handleDurationChange);
+    return () => {
+      if (audioElement)
+        audioElement.removeEventListener(
+          'durationchange',
+          handleDurationChange,
+        );
+    };
+  }, [audioElement]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -59,7 +119,7 @@ const Timeline = () => {
   ) : null;
 
   return (
-    <div ref={timelineRef}>
+    <div ref={timelineRef} onWheel={handleWheel}>
       <PlaybackHead timeScale={timeScale} />
       <PlaybackAxis
         timeScale={timeScale}

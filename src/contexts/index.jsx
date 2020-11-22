@@ -1,17 +1,21 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { BrowserRouter as Router } from 'react-router-dom';
+import { ErrorBoundary } from 'react-error-boundary';
 
 import { AppAudioContextProvider } from './AppAudioContext/AppAudioContext';
 import { ToastContextProvider } from './ToastContext';
+import { ErrorFallback } from '../components';
 
 const AppContextProvider = ({ children }) => {
   return (
-    <Router>
-      <ToastContextProvider>
-        <AppAudioContextProvider>{children}</AppAudioContextProvider>
-      </ToastContextProvider>
-    </Router>
+    <ErrorBoundary FallbackComponent={ErrorFallback}>
+      <Router>
+        <ToastContextProvider>
+          <AppAudioContextProvider>{children}</AppAudioContextProvider>
+        </ToastContextProvider>
+      </Router>
+    </ErrorBoundary>
   );
 };
 

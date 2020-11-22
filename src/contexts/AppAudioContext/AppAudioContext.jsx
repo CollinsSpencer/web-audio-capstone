@@ -51,11 +51,6 @@ export const AppAudioContextProvider = ({ children }) => {
     }
   }, [audioContextInstance, toast]);
 
-  // const closeAudioContext = () => {
-  //   if (audioContext) audioContext.close();
-  //   setAudioContext(null);
-  // };
-
   const openAudioStream = async () => {
     const mediaStream = await navigator.mediaDevices.getUserMedia({
       audio: true,
@@ -104,7 +99,6 @@ export const AppAudioContextProvider = ({ children }) => {
   );
 
   useEffect(() => {
-    console.log('USE EFFECT');
     const tracks = Object.values(state.tracks);
     if (!tracks || tracks.length === 0) return;
     const audioContext = getAudioContext();
@@ -196,8 +190,6 @@ export const AppAudioContextProvider = ({ children }) => {
         if (close) closeAudioStream();
       },
       startRecordingTimeStamp,
-      // filteredAudioRecordingData,
-      // setFilteredAudioRecordingData,
       startPlaying: () => {
         audioElement.play();
       },
@@ -207,23 +199,14 @@ export const AppAudioContextProvider = ({ children }) => {
         downloadFile(`${name}${extension}`);
       },
       getCurrentPlaybackTime: () => {
-        // if (audioElement) console.log(audioElement.currentTime);
         return audioElement ? audioElement.currentTime : 0;
       },
-      // addAudioSource: async (audioBuffer) => {
-      //   const audioContext = getAudioContext();
-      //   const audioSource = audioContext.createBufferSource(audioBuffer);
-      //   audioSource.connect(audioContext.destination);
-      //   console.log('audio connected!', audioSource);
-      // },
       audioAnalyser,
-      // audioContext: audioContextInstance,
       getAudioContext,
       audioElement,
       audioRecorder,
       tracks: Object.values(state.tracks),
       addTrack: async (track) => {
-        console.log(track);
         dispatch(actions.addTrack({ ...track, trackId: uuidv4() }));
       },
       setTrackOffset: (trackId, offset) => {

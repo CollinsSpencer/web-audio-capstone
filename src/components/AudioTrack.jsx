@@ -58,19 +58,15 @@ const AudioTrack = ({
       .domain([0, max(filteredData)])
       .range([1, height]);
 
-    const bar = select(trackRef.current)
+    select(trackRef.current)
       .select('g')
-      .selectAll('g')
+      .selectAll('rect')
       .data(filteredData)
-      .enter()
-      .append('g')
+      .join('rect')
       .attr(
         'transform',
         (d, i) => `translate(${x(i)}, ${height / 2 - y(d) / 2})`,
-      );
-
-    bar
-      .append('rect')
+      )
       .attr('class', 'track-audio')
       .attr('width', x.bandwidth())
       .attr('height', y);
