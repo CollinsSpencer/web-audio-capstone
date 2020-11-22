@@ -6,9 +6,10 @@ import { dateFromSeconds } from '../utils';
 import AudioTrack from './AudioTrack';
 import PlaybackAxis from './PlaybackAxis';
 import PlaybackHead from './PlaybackHead';
+import ActiveRecordingTrack from './ActiveRecordingTrack';
 
 const Timeline = () => {
-  const { tracks } = useAppAudioContext();
+  const { tracks, isRecording } = useAppAudioContext();
   const timelineRef = useRef();
   const [dimensions, setDimensions] = useState(
     timelineRef.current
@@ -51,6 +52,12 @@ const Timeline = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, [timelineRef]);
 
+  const trackPlaceholder = !isRecording ? (
+    <h3 style={{ color: 'white' }}>
+      Click &quot;Record&quot; to make your first track
+    </h3>
+  ) : null;
+
   return (
     <div ref={timelineRef}>
       <PlaybackHead timeScale={timeScale} />
@@ -60,23 +67,21 @@ const Timeline = () => {
         timelineEndTime={timelineEndTime}
         width={dimensions.width}
       />
-      {tracks
+      {tracks && tracks.length > 0
         ? tracks.map((t) => (
             <AudioTrack
               timeScale={timeScale}
-              // audio={t.audio}
-              // audioBuffer={t.audioBuffer}
               audioDuration={t.audioBuffer.duration}
               filteredData={t.filteredData}
               name={t.name}
               trackId={t.trackId}
               key={t.name}
-              // currentPlaybackTime={currentPlaybackTime}
-              // timelineStartTime={timelineStartTime}
-              // timelineEndTime={timelineEndTime}
             />
           ))
-        : 'record to make your first track'}
+        : trackPlaceholder}
+      {isRecording && (
+        <ActiveRecordingTrack timeScale={timeScale} key="active-recording" />
+      )}
     </div>
   );
 };

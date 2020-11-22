@@ -39,18 +39,18 @@ button {
   text-align: left;
 
   &.primary {
-    background-color: #4ca5cd;
+    background-color: $primary;
     color: #ffffff;
     &:hover {
-      background-color: #4ca5cdcc;
+      background-color: $primary-fade;
     }
   }
 
   &.secondary {
-    background-color: #f2cc59;
+    background-color: $secondary;
     color: #333333;
     &:hover {
-      background-color: #f2cc59cc;
+      background-color: $secondary-fade;
     }
   }
 
@@ -65,11 +65,11 @@ button {
     }
 
     &.primary {
-      border-color: #4ca5cd;
+      border-color: $primary;
     }
 
     &.secondary {
-      border-color: #f2cc59;
+      border-color: $secondary;
     }
   }
 
@@ -122,7 +122,7 @@ button {
     padding: 1rem 0.5rem;
 
     &:focus {
-      border-bottom-color: #4ca5cd;
+      border-bottom-color: $primary;
       border-bottom-width: 2px;
       outline: none;
     }

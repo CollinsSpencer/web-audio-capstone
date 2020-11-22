@@ -1,0 +1,25 @@
+.track {
+  width: 100%;
+  text-align: left;
+  border-bottom: 1px solid grey;
+
+  &-box {
+    fill: $primary;
+  }
+
+  &-audio {
+    fill: $primary-dark;
+  }
+}
+
+.recording {
+  .track {
+    &-box {
+      fill: $green;
+    }
+
+    &-audio {
+      fill: $green-dark;
+    }
+  }
+}

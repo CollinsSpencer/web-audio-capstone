@@ -23,5 +23,14 @@ code {
   padding: 0 0.2em;
 }
 
-@import 'App.styles.scss';
-@import './components/Toolbar/Toolbar.styles.scss';
+$primary: #4ca5cd;
+$primary-fade: #4ca5cdcc;
+$primary-dark: #1f5e7acc;
+$secondary: #f2cc59;
+$secondary-fade: #f2cc59cc;
+$green: #4caf50;
+$green-dark: #1b5e20cc;
+
+@import './styles/App.styles.scss';
+@import './styles/Toolbar.styles.scss';
+@import './styles/Track.styles.scss';

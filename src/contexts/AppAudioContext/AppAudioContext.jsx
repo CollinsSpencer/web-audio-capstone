@@ -27,6 +27,9 @@ export const AppAudioContextProvider = ({ children }) => {
   const [audioAnalyser, setAudioAnalyser] = useState();
   const [audioContextInstance, setAudioContextInstance] = useState();
   const [audioRecorder, setAudioRecorder] = useState();
+  const [isRecording, setIsRecording] = useState();
+  const [startRecordingTimeStamp, setStartRecordingTimeStamp] = useState();
+  const [pauseRecordingTimeStamp, setPauseRecordingTimeStamp] = useState();
   const [audioStreamSourceNode, setAudioStreamSourceNode] = useState();
   const [audioElement, setAudioElement] = useState();
   const audioStream = useRef();
@@ -133,45 +136,68 @@ export const AppAudioContextProvider = ({ children }) => {
     [audioElement],
   );
 
+  const startAnalysing = useCallback(async () => {
+    if (!audioStream.current) await openAudioStream();
+    const audioContext = getAudioContext();
+    const source = audioContext.createMediaStreamSource(audioStream.current);
+    const analyserInstance = audioContext.createAnalyser();
+    source.connect(analyserInstance);
+    source.connect(audioContext.destination);
+    setAudioAnalyser(analyserInstance);
+    setAudioStreamSourceNode(source);
+  }, [getAudioContext]);
+
+  const stopAnalysing = useCallback(
+    (close = true) => {
+      if (audioAnalyser) audioAnalyser.disconnect();
+      if (audioStreamSourceNode) audioStreamSourceNode.disconnect();
+      setAudioAnalyser(null);
+      setAudioStreamSourceNode(null);
+      if (close) closeAudioStream();
+    },
+    [audioAnalyser, audioStreamSourceNode],
+  );
+
   const context = useMemo(
     () => ({
-      startAnalysing: async () => {
-        if (!audioStream.current) await openAudioStream();
-        const audioContext = getAudioContext();
-        const source = audioContext.createMediaStreamSource(
-          audioStream.current,
-        );
-        const analyserInstance = audioContext.createAnalyser();
-        source.connect(analyserInstance);
-        source.connect(audioContext.destination);
-        setAudioAnalyser(analyserInstance);
-        setAudioStreamSourceNode(source);
-      },
-      stopAnalysing: (close = true) => {
-        if (audioAnalyser) audioAnalyser.disconnect();
-        if (audioStreamSourceNode) audioStreamSourceNode.disconnect();
-        setAudioAnalyser(null);
-        setAudioStreamSourceNode(null);
-        if (close) closeAudioStream();
-      },
+      startAnalysing,
+      stopAnalysing,
       startRecording: async () => {
         if (!audioStream.current) await openAudioStream();
         if (!audioRecorder) {
-          const mediaRecorder = new window.MediaRecorder(audioStream.current);
+          const mediaRecorder = new window.MediaRecorder(audioStream.current, {
+            mimeType: 'audio/webm;codecs=pcm',
+          });
           setAudioRecorder(mediaRecorder);
           mediaRecorder.start();
+          setStartRecordingTimeStamp(performance.now());
+          await startAnalysing();
         } else {
           audioRecorder.resume();
+          setStartRecordingTimeStamp(
+            startRecordingTimeStamp +
+              (performance.now() - pauseRecordingTimeStamp),
+          );
+          setPauseRecordingTimeStamp(null);
         }
+        setIsRecording(true);
       },
       pauseRecording: () => {
         if (audioRecorder) audioRecorder.pause();
+        setPauseRecordingTimeStamp(performance.now());
       },
       stopRecording: (close = true) => {
+        setIsRecording(false);
         if (audioRecorder) audioRecorder.stop();
+        setStartRecordingTimeStamp(null);
+        setPauseRecordingTimeStamp(null);
         setAudioRecorder(null);
+        stopAnalysing(close);
         if (close) closeAudioStream();
       },
+      startRecordingTimeStamp,
+      // filteredAudioRecordingData,
+      // setFilteredAudioRecordingData,
       startPlaying: () => {
         audioElement.play();
       },
@@ -204,15 +230,20 @@ export const AppAudioContextProvider = ({ children }) => {
         dispatch(actions.updateTrackOffset(trackId, offset));
       },
       hasAudio: !!audioElement,
+      isRecording,
     }),
     [
+      startAnalysing,
+      stopAnalysing,
       audioAnalyser,
       audioElement,
       audioRecorder,
-      audioStreamSourceNode,
+      pauseRecordingTimeStamp,
+      startRecordingTimeStamp,
       downloadFile,
       getAudioContext,
       state.tracks,
+      isRecording,
     ],
   );
 
