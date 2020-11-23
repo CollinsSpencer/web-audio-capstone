@@ -42,6 +42,9 @@ const ModalAudioDownload = ({ isOpen, close }) => {
         </div>
       </div>
       <div className="modal-footer">
+        <button onClick={close} type="button">
+          Cancel
+        </button>
         <button onClick={handleDownload} type="button" className="primary">
           Download
         </button>

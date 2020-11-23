@@ -138,6 +138,7 @@ button {
   display: flex;
   flex-direction: column;
   position: relative;
+  color: #333333;
 
   label {
     position: absolute;
@@ -173,6 +174,7 @@ button {
 .modal {
   border: 1px solid #cccccc;
   background: #ffffff;
+  color: #333333;
   overflow: auto;
   border-radius: 6px;
   outline: none;
@@ -184,23 +186,27 @@ button {
 
   .modal-header {
     border-bottom: 1px solid #cccccc;
-    padding: 24px;
+    padding: 1.5rem;
   }
 
   .modal-content {
     max-height: calc(100vh - 280px);
     overflow: auto;
-    padding: 24px 24px 0px;
+    padding: 1.5rem 1.5rem 0px;
 
     > * + * {
-      margin-top: 24px;
+      margin-top: 1.5rem;
     }
   }
 
   .modal-footer {
-    padding: 24px;
+    padding: 1.5rem;
     display: flex;
     flex-flow: row;
     justify-content: flex-end;
+
+    > * + * {
+      margin-left: 1.5rem;
+    }
   }
 }
