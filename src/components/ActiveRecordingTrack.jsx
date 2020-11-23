@@ -2,10 +2,11 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { scalePow } from 'd3-scale';
 import { select } from 'd3-selection';
-import { useAppAudioContext } from '../contexts';
+import { transform } from 'd3-transform';
+import { useAppAudioContext } from '../contexts/AppAudioContext';
 import { dateFromSeconds } from '../utils';
 
-const ActiveRecordingTrack = ({ timeScale }) => {
+const ActiveRecordingTrack = ({ timeScale, sidebarWidth, width }) => {
   const {
     audioAnalyser,
     isRecording,
@@ -29,9 +30,14 @@ const ActiveRecordingTrack = ({ timeScale }) => {
   const styles = {
     root: {
       height: `${height}px`,
+      display: 'flex',
+      flexDirection: 'row',
+    },
+    sidebar: {
+      width: sidebarWidth,
     },
     svg: {
-      width: '100%',
+      width,
       height: `${height}px`,
     },
   };
@@ -51,10 +57,10 @@ const ActiveRecordingTrack = ({ timeScale }) => {
       .join('rect')
       .attr(
         'transform',
-        ({ timeOffset, value }) =>
-          `translate(${timeScale(dateFromSeconds(timeOffset))}, ${
-            height / 2 - y(value) / 2
-          })`,
+        transform().translate(({ timeOffset, value }) => [
+          timeScale(dateFromSeconds(timeOffset)),
+          height / 2 - y(value) / 2,
+        ]),
       )
       .attr('class', 'track-audio')
       .attr('width', barWidth)
@@ -96,6 +102,9 @@ const ActiveRecordingTrack = ({ timeScale }) => {
 
   return (
     <div style={styles.root} className="track recording">
+      <div style={styles.sidebar} className="sidebar">
+        <span>Recording...</span>
+      </div>
       <svg style={styles.svg}>
         <svg ref={trackRef}>
           <rect
@@ -107,9 +116,9 @@ const ActiveRecordingTrack = ({ timeScale }) => {
             ry="5"
           />
           <g />
-          <text dx="2" fill="#FFFFFF">
-            Recording...
-          </text>
+          {/* <text dx="2" fill="#FFFFFF">
+            Track #
+          </text> */}
         </svg>
       </svg>
     </div>
@@ -117,6 +126,8 @@ const ActiveRecordingTrack = ({ timeScale }) => {
 };
 ActiveRecordingTrack.propTypes = {
   timeScale: PropTypes.func.isRequired,
+  sidebarWidth: PropTypes.number.isRequired,
+  width: PropTypes.number.isRequired,
 };
 
 export default ActiveRecordingTrack;

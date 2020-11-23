@@ -3,11 +3,13 @@ import PropTypes from 'prop-types';
 
 const WaveformVisualiser = ({ getTimeDomainData }) => {
   const canvasRef = useRef();
+  const wrapperRef = useRef();
   const requestRef = useRef();
 
   const draw = (audioData) => {
     const canvas = canvasRef.current;
-    canvas.width = document.body.clientWidth;
+    const { width: wrapperWidth } = wrapperRef.current.getBoundingClientRect();
+    canvas.width = wrapperWidth;
     const { height, width } = canvas;
     const context = canvas.getContext('2d');
     let x = 0;
@@ -39,7 +41,11 @@ const WaveformVisualiser = ({ getTimeDomainData }) => {
     return () => cancelAnimationFrame(requestRef.current);
   }, [animate]);
 
-  return <canvas width="600" height="256" ref={canvasRef} />;
+  return (
+    <div style={{ width: '100%' }} ref={wrapperRef}>
+      <canvas width="600" height="256" ref={canvasRef} />
+    </div>
+  );
 };
 
 WaveformVisualiser.propTypes = {

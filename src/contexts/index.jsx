@@ -5,7 +5,7 @@ import { ErrorBoundary } from 'react-error-boundary';
 
 import { AppAudioContextProvider } from './AppAudioContext/AppAudioContext';
 import { ToastContextProvider } from './ToastContext';
-import { ErrorFallback } from '../components';
+import ErrorFallback from '../components/ErrorFallback';
 
 const AppContextProvider = ({ children }) => {
   return (
@@ -26,5 +26,4 @@ AppContextProvider.propTypes = {
   ]).isRequired,
 };
 
-export { AppContextProvider };
-export * from './AppAudioContext/AppAudioContext';
+export default AppContextProvider;

@@ -5,6 +5,16 @@
   min-height: 100vh;
 }
 
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p {
+  margin: 0;
+}
+
 a {
   color: #fff;
 }
@@ -13,6 +23,20 @@ header {
   background: #4ca5cd;
   color: #fff;
   flex-shrink: 0;
+
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+
+  .title {
+    flex-grow: 1;
+  }
+
+  nav {
+    * {
+      margin-right: 1rem;
+    }
+  }
 }
 
 main {
@@ -23,6 +47,7 @@ footer {
   flex-shrink: 0;
   background: #736d67;
   color: #fff;
+  padding: 1rem;
 }
 
 button {
@@ -38,6 +63,10 @@ button {
   padding: 0.5rem 1rem;
   text-align: left;
 
+  &.icon {
+    padding: 0.5rem;
+  }
+
   &.primary {
     background-color: $primary;
     color: #ffffff;
@@ -51,6 +80,14 @@ button {
     color: #333333;
     &:hover {
       background-color: $secondary-fade;
+    }
+  }
+
+  &.tertiary {
+    background-color: $purple;
+    color: #000000;
+    &:hover {
+      background-color: $purple-dark;
     }
   }
 
@@ -70,6 +107,10 @@ button {
 
     &.secondary {
       border-color: $secondary;
+    }
+
+    &.tertiary {
+      border-color: $purple;
     }
   }
 
@@ -140,16 +181,6 @@ button {
   margin-left: auto;
   margin-right: auto;
   margin-top: 50px;
-
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6,
-  p {
-    margin: 0;
-  }
 
   .modal-header {
     border-bottom: 1px solid #cccccc;

@@ -12,7 +12,7 @@ import PropTypes from 'prop-types';
 import { v4 as uuidv4 } from 'uuid';
 import { useToastContext } from '../ToastContext';
 import { actions, initialState, reducer } from './reducer';
-import { bufferToWave } from '../../utils/audio';
+import { bufferToWave } from '../../utils';
 
 const defaultContext = {
   open: () => null,
@@ -136,7 +136,7 @@ export const AppAudioContextProvider = ({ children }) => {
     const source = audioContext.createMediaStreamSource(audioStream.current);
     const analyserInstance = audioContext.createAnalyser();
     source.connect(analyserInstance);
-    source.connect(audioContext.destination);
+    // source.connect(audioContext.destination);
     setAudioAnalyser(analyserInstance);
     setAudioStreamSourceNode(source);
   }, [getAudioContext]);
@@ -209,8 +209,16 @@ export const AppAudioContextProvider = ({ children }) => {
       addTrack: async (track) => {
         dispatch(actions.addTrack({ ...track, trackId: uuidv4() }));
       },
+      deleteTrack: async (trackId) => {
+        if (Object.keys(state.tracks).length <= 1 && audioElement)
+          audioElement.currentTime = 0;
+        dispatch(actions.deleteTrack(trackId));
+      },
       setTrackOffset: (trackId, offset) => {
         dispatch(actions.updateTrackOffset(trackId, offset));
+      },
+      setPlaybackHeadOffset: (offset) => {
+        if (audioElement) audioElement.currentTime = offset;
       },
       hasAudio: !!audioElement,
       isRecording,

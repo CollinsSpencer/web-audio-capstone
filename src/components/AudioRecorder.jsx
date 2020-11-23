@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef } from 'react';
-import { useAppAudioContext } from '../contexts';
+import { useAppAudioContext } from '../contexts/AppAudioContext';
 
 const AudioRecorder = () => {
   const audioData = useRef([]);

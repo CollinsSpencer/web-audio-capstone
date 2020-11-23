@@ -5,6 +5,7 @@ export const initialState = {
 // Action Types
 export const ADD_TRACK = 'appAudioContext/ADD_TRACK';
 export const UPDATE_TRACK_OFFSET = 'appAudioContext/UPDATE_TRACK_OFFSET';
+export const DELETE_TRACK = 'appAudioContext/DELETE_TRACK';
 
 // Actions
 export const actions = {
@@ -15,6 +16,10 @@ export const actions = {
   updateTrackOffset: (trackId, offset) => ({
     type: UPDATE_TRACK_OFFSET,
     payload: { trackId, offset },
+  }),
+  deleteTrack: (trackId) => ({
+    type: DELETE_TRACK,
+    payload: { trackId },
   }),
 };
 
@@ -29,6 +34,10 @@ const tracks = (state = {}, action) => {
         ...state,
         [action.payload.trackId]: { ...track, offset: action.payload.offset },
       };
+    }
+    case DELETE_TRACK: {
+      const { [action.payload.trackId]: value, ...newState } = state;
+      return newState;
     }
     default:
       return state;

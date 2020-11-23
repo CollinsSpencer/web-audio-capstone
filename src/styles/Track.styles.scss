@@ -2,6 +2,7 @@
   width: 100%;
   text-align: left;
   border-bottom: 1px solid grey;
+  display: flex;
 
   &-box {
     fill: $primary;
@@ -22,4 +23,11 @@
       fill: $green-dark;
     }
   }
+}
+
+.sidebar {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
 }

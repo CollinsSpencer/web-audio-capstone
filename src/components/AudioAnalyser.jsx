@@ -1,5 +1,5 @@
 import React from 'react';
-import { useAppAudioContext } from '../contexts';
+import { useAppAudioContext } from '../contexts/AppAudioContext';
 import WaveformVisualiser from './WaveformVisualiser';
 import FrequencyVisualiser from './FrequencyVisualiser';
 

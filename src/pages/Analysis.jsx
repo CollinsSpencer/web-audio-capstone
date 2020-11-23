@@ -4,8 +4,10 @@ import PageLayout from './PageLayout';
 
 const Analysis = () => {
   return (
-    <PageLayout title="Audio Analysis">
-      <AudioAnalyser />
+    <PageLayout title="Audio Analysis" style={{ padding: '2rem' }}>
+      <div style={{ position: 'relative' }}>
+        <AudioAnalyser />
+      </div>
     </PageLayout>
   );
 };

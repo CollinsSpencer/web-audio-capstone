@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { scaleTime } from 'd3-scale';
 // import PropTypes from 'prop-types';
-import { useAppAudioContext } from '../contexts';
+import { useAppAudioContext } from '../contexts/AppAudioContext';
 import { dateFromSeconds } from '../utils';
 import AudioTrack from './AudioTrack';
 import PlaybackAxis from './PlaybackAxis';
@@ -14,7 +14,7 @@ const Timeline = () => {
   const timelineRef = useRef();
   const [audioDuration, setAudioDuration] = useState(0);
   const minTime = 0;
-  const maxTime = Math.max(audioDuration * 1.1, 2);
+  const maxTime = Math.max(audioDuration * 1.1, 12);
   const shortestTime = 0.5;
   const [timelineStartTime, setTimelineStartTime] = useState(minTime);
   const [timelineEndTime, setTimelineEndTime] = useState(maxTime);
@@ -23,6 +23,7 @@ const Timeline = () => {
       ? timelineRef.current.getBoundingClientRect()
       : { width: 0, height: 0 },
   );
+  const sidebarWidth = 100;
   const getKeys = useKeyboardShortcut(['Shift', 'Alt'], () => null);
 
   const timeScale = scaleTime()
@@ -30,7 +31,7 @@ const Timeline = () => {
       dateFromSeconds(timelineStartTime),
       dateFromSeconds(timelineEndTime),
     ])
-    .range([0, dimensions.width]);
+    .range([0, dimensions.width - sidebarWidth]);
 
   const handleWheel = (event) => {
     const { deltaY } = event;
@@ -120,19 +121,32 @@ const Timeline = () => {
 
   return (
     <div ref={timelineRef} onWheel={handleWheel}>
-      <PlaybackHead timeScale={timeScale} />
-      <PlaybackAxis
-        timeScale={timeScale}
-        timelineStartTime={timelineStartTime}
-        timelineEndTime={timelineEndTime}
-        width={dimensions.width}
-      />
+      <div style={{ display: 'flex', flexDirection: 'row' }}>
+        <div style={{ width: sidebarWidth }} />
+        <div>
+          <PlaybackHead
+            timeScale={timeScale}
+            width={dimensions.width - sidebarWidth}
+          />
+          <PlaybackAxis
+            timeScale={timeScale}
+            timelineStartTime={timelineStartTime}
+            timelineEndTime={timelineEndTime}
+            width={dimensions.width - sidebarWidth}
+          />
+        </div>
+      </div>
       {tracks && tracks.length > 0
         ? tracks.map((t) => (
             <AudioTrack
               timeScale={timeScale}
               audioDuration={t.audioBuffer.duration}
+              audioOffset={t.offset}
+              timelineStartTime={timelineStartTime}
+              timelineEndTime={timelineEndTime}
               filteredData={t.filteredData}
+              sidebarWidth={sidebarWidth}
+              width={dimensions.width - sidebarWidth}
               name={t.name}
               trackId={t.trackId}
               key={t.name}
@@ -140,7 +154,12 @@ const Timeline = () => {
           ))
         : trackPlaceholder}
       {isRecording && (
-        <ActiveRecordingTrack timeScale={timeScale} key="active-recording" />
+        <ActiveRecordingTrack
+          timeScale={timeScale}
+          sidebarWidth={sidebarWidth}
+          width={dimensions.width - sidebarWidth}
+          key="active-recording"
+        />
       )}
     </div>
   );
