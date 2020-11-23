@@ -57,6 +57,9 @@ const AudioTrack = ({
       width,
       height: `${height}px`,
     },
+    track: {
+      cursor: 'ew-resize',
+    },
   };
 
   useEffect(() => {
@@ -133,10 +136,9 @@ const AudioTrack = ({
       </div>
 
       <svg style={styles.svg}>
-        <svg ref={trackRef} x={offsetPosition}>
+        <svg ref={trackRef} x={offsetPosition} style={styles.track}>
           <rect
             className="track-box"
-            style={styles.rect}
             textAnchor="start"
             width={trackWidth}
             height={height}
